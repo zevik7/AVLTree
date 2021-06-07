@@ -1,0 +1,5 @@
+--------------------AVL Tree visualization------------------
+- Viết trên nền visual studio 2019
+- Sử dụng thư viện SFML 2.5.1
+- PHẢI CHẠY Ở CHẾ ĐỘ 32bit
+- KHÔNG XÓA THƯ MỤC SFML VÀ CÁC .DLL TRONG THƯ MỤC DEBUG
