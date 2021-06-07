@@ -1,179 +1,292 @@
 ﻿#include <iostream>
-#include <algorithm>
-#include "Node.cpp"
+#include "AVLTree.h"
 using namespace std;
-class AVLTree {
-private:
-	Node* root;
-public:
-	AVLTree(){
-		root = NULL;
-	}
-	// Phuong thuc lay chieu cao not hoac cay
-	int getHeight(Node* a) {
-		if (a == NULL) return -1;
-		return a->height;
-	}
-	int getHeight() {
-		return root->height;
-	}
-	// Tinh lai chieu cao cua mot not
-	int calHeight(Node* a) {
-		return max(getHeight(a->left), getHeight(a->right)) + 1;
-	}
-	// Tinh he so can bang tai mot not
-	int calBalance(Node* a) {
-		if (a == NULL) return 0;
-		// Neu 2 node con la null thi height la -1 (-1-1=-2) co the gay sai nen phai tang 1 don vi
-		return (getHeight(a->left) + 1) - (getHeight(a->right) + 1);
-	}
-	int calBalance() {
-		if (root == NULL) return 0;
-		return (getHeight(root->left) + 1) - (getHeight(root->right) + 1);
-	}
-	// Tim mot not co gia tri x trong root
-	Node* search(Node* searchingNode, int x) {
-		if (root == NULL) return 0;
-		if (root->value == x) return root;
-		if (x < root->value) 
-			return search(root->left, x);
-		if (x > root->value) 
-			return search(root->right, x);
-	}
-	Node* search(int x) {
-		return search(root, x);
-	}
-	void rightRotate(Node* &a) { //Xoay phai  tai a khi lech trai
-		if (a == NULL) return;
-		if (a->left == NULL) return;
-		Node* leftRoot = a->left; // Bien tam luu Node can doi voi root
-		a->left = leftRoot->right; // Con trai cua root se thanh con phai cua Node can doi
-		leftRoot->right = a; //Root se thanh con phai->cua con trai Root
-		//Cap nhat lai chieu cao
-		a->height = calHeight(a);
-		leftRoot->height = calHeight(leftRoot);
-		//Cap nhat lai leftRoot, vi ban chat to tien cua root van tro den root
-		a = leftRoot;
-	}
-	void leftRotate(Node* &a) { //Xoay trai khi lech phai
-		if (a == NULL) return;
-		if (a->right == NULL) return;
-		Node* rightRoot = a->right; // Bien tam luu Node can doi voi root
-		a->right = rightRoot->left; // Con phai cua root se thanh con trai cua Node can doi
-		rightRoot->left = a; //Root se thanh con trai cua con trai Root
-		//Cap nhat lai chieu cao
-		a->height = calHeight(a);
-		rightRoot->height = calHeight(rightRoot);
-		//Cap nhat lai rightRoot, vi ban chat to tien cua root van tro den root
-		a = rightRoot;
-	}
-	// Can bang tai not a
-	void balanceNode(Node* &a) {
-		int balanceValue = calBalance(a);
-		if (balanceValue > 1)
-		{
-			if (calBalance(a->left) < 0)
-				leftRotate(a->left); //Lech trai trai ,xoay trai truoc khi xoay phai
-			rightRotate(a);
-		}
-		if (balanceValue < -1)
-		{
-			if (calBalance(a->right) > 0)
-				rightRotate(a->right);
-			leftRotate(a);
-		}
-	}
-	void insert(Node* &insertNode, int x) {
-		if (insertNode == NULL) {
-			insertNode = new Node(x);
-			return;
-		}
-		if (insertNode->value == x) return;
-		//So sanh x va gia tri node hien tai
-		if (x < insertNode->value)
-			insert(insertNode->left, x);
-		else
-			insert(insertNode->right, x);
-		//Tinh lai chieu cao cua node hien tai sao khi chen
-		insertNode->height = calHeight(insertNode);
-		//Can bang lai node sao khi chen
-		balanceNode(insertNode);
-	}
-	void insert(int x) {
-		insert(root, x);
-	}
-	void replacementNode(Node* &root,Node* &rightChild) {
-		if (rightChild->left != NULL)
-		{
-			replacementNode(root, rightChild->left);// tim ra node trai nhat
-		}
-		else {
-			root->value = rightChild->value;
-			root = rightChild;
-			//Con trai nhat chi co con phai nen thay the no bang con phai
-			rightChild = rightChild->right;
-		}
-	}
-	void delNode(Node* &a, int x) {
-		if (a == NULL) return;
-		if (a->value > x) delNode(a->left, x); //logn
-		else if (a->value < x) delNode(a->right, x);
-		else {
-			//Da tim duoc node can xoa
-			Node* deleteNode = a;
-			// TH1 : Nut co 1 con
-			if (a->left == NULL) {
-				a = a->right;
-			}
-			else if (a->right == NULL) {
-				a = a->left;
-			}
-			// TH2: Nut co 2 con
-			else {
-				replacementNode(deleteNode, a->right);//logn
-			}
-			delete deleteNode;
-		}
-		balanceNode(a);
-	}
-	void delNode(int x) {
-		delNode(root, x);
-	}
 
-	void NLR(Node* root)
-	{
-		if (root != NULL)
-		{
-			cout << root->value << "	";
-			NLR(root->left);
-			NLR(root->right);
-		}
-	}
-	void LNR(Node* root)
-	{
-		if (root != NULL)
-		{
-			LNR(root->left);
-			cout << root->value << "	";
-			LNR(root->right);
-		}
-	}
-	void LRN(Node* root)
-	{
-		if (root != NULL)
-		{
-			LNR(root->left);
-			LNR(root->right);
-			cout << root->value << "	";
-		}
-	}
-	void NLR() { 
-		NLR(root);
-	}
-	void LNR() {
-		LNR(root);
-	}
-	void LRN() {
-		LRN(root);
-	}
-};
+//Ham khoi tao
+AVLTree::AVLTree()
+{
+    root = NULL;
+}
+//Ham huy
+AVLTree::~AVLTree()
+{
+
+}
+int AVLTree::calHeight(Node* q)
+{
+    if (q == NULL) return 0;
+    int heightLeftChild = q->left ? q->left->height : 0;
+    int heightRightChild = q->right ? q->right->height : 0;
+
+    return (heightRightChild > heightLeftChild ? heightRightChild: heightLeftChild) + 1;
+}
+
+int AVLTree::calBalance(Node* q)
+{
+    if (q == NULL) return 0;
+    int heightLeftChild = q->left ? q->left->height : 0;
+    int heightRightChild = q->right ? q->right->height : 0;
+
+    return (heightLeftChild - heightRightChild);
+}
+
+void AVLTree::resetColor(Node* a) {
+    if (a != NULL)
+    {
+        a->circle.setFillColor(sf::Color::Green);
+        resetColor(a->left);
+        resetColor(a->right);
+    }
+}
+Node* AVLTree::search(int key, Node* q)
+{
+    if (q == NULL) NULL;
+    else if (q->value == key) return q;
+    else if (key < q->value)
+    {
+        q->circle.setFillColor(sf::Color::Yellow);
+        return search(key, q->left);
+    }
+    else if (key > q->value)
+    {
+        q->circle.setFillColor(sf::Color::Yellow);
+        return search(key, q->right);
+    }
+}
+Node* AVLTree::balanceNode(Node* a) {
+    int balanceValue = calBalance(a);
+    if (balanceValue > 1)
+    {
+        if (calBalance(a->left) < 0)
+            return leftRightRotation(a); //Lech trai phai, xoay trai phai
+        return rightRotation(a);// Lech trai phai, chi can xoay phai
+    }
+    if (balanceValue < -1)
+    {
+        if (calBalance(a->right) > 0)
+            return rightLeftRotation(a);
+        return leftRotation(a);
+    }
+    return a;
+}
+Node* AVLTree::insert(Node* a, int key)
+{
+    Node* addNode = NULL;
+    if (a == NULL)
+    {
+        addNode = new Node();
+        addNode->value = key;
+        return addNode;
+    }
+    if (a->value < key)
+    {
+        a->right = insert(a->right, key);
+    }
+    else if (a->value > key)
+    {
+        a->left = insert(a->left, key);
+    }
+    a->height = calHeight(a);
+    balanceNode(a);
+}
+Node* AVLTree::delNode(int x, Node* a) {
+    Node* p;
+    if (a == NULL) return NULL;
+    if (!a->left && !a->right && a->value == x) //Neu tim thay
+    {
+        if (a == root)
+            root = NULL;
+        delete a;
+        return NULL;
+    }
+    if (x < a->value)
+        a->left = delNode(x, a->left);
+    else if (x > a->value)
+        a->right = delNode(x, a->right);
+    else
+    {
+        //doi cho voi con trai nhat hoac phai nhat de xoa
+        if (calHeight(a->left) > calHeight(a->right))
+        {
+            p = rightMostChild(a->left);
+            a->value = p->value;
+            a->left = delNode(p->value, a->left);
+        }
+        else
+        {
+            p = leftMostChild(a->right);
+            a->value = p->value;
+            a->right = delNode(p->value, a->right);
+        }
+    }
+    if (!a) return a;
+    a->height = calHeight(a);
+    balanceNode(a);
+}
+Node* AVLTree::rightRotation(Node* a) // Xoay phai khi lech trai trai
+{
+    //Luu con trai cua a
+    Node* al = a->left;
+    //Luu con phai cua con trai (Neu co)
+    Node* alr = al->right;
+    //Con trai cua a se luu con phai cua con trai (Neu co)
+    a->left = alr;
+    al->right = a;
+
+    //Tinh lai chieu cao
+    a->height = calHeight(a);
+    al->height = calHeight(al);
+    //Neu a la root thi phai gan lai root
+    if (a == root) root = al;
+    return al;
+}
+
+Node* AVLTree::leftRightRotation(Node* a)
+{
+    //Con trai
+    Node* al = a->left;
+    //Con phai cua con trai
+    Node* alr = al->right;
+
+    //Con phai al tro den con trai alr
+    al->right = alr->left;
+    a->left = alr->right;
+
+    //Xong xoay 
+    alr->left = al;
+    alr->right = a;
+
+    //Cap nhat chieu cao
+    a->height = calHeight(a);
+    al->height = calHeight(al);
+    alr->height = calHeight(alr);
+    if (a == root) root = alr;
+    return alr;
+}
+
+Node* AVLTree::rightLeftRotation(Node* a)
+{
+    Node* ar = a->right;
+    Node* arl = ar->left;
+    ar->left = arl->right;
+    a->right = arl->left;
+    arl->right = ar;
+    arl->left = a;
+    a->height = calHeight(a);
+    ar->height = calHeight(ar);
+    arl->height = calHeight(arl);
+    if (a == root) root = arl;
+    return arl;
+}
+
+Node* AVLTree::leftRotation(Node* a) //Xoay trai khi lech phai
+{
+    //Luu con phai
+    Node* ar = a->right; 
+    //Luu con trai cua con phai (Neu co)
+    Node* arl = ar->left; 
+    //Con trai cua a se luu con phai cua con trai (Neu co)
+    a->right = arl;
+    ar->left = a;
+    //Tinh lai chieu cao
+    a->height = calHeight(a);
+    ar->height = calHeight(ar);
+    //Neu la root thi phai cap nhat lai
+    if (a == root) root = ar;
+    return ar;
+}
+
+Node* AVLTree::getroot()
+{
+    return root;
+}
+
+void AVLTree::setroot(Node* q)
+{
+    root = q;
+}
+Node* AVLTree::rightMostChild(Node* p)
+{
+    while (p && p->right)
+        p = p->right;
+    return p;
+}
+Node* AVLTree::leftMostChild(Node* p)
+{
+    while (p && p->left)
+        p = p->left;
+    return p;
+}
+
+void AVLTree::draw(Node* q, sf::RenderWindow& window)
+{
+    if (q)
+    {
+        window.draw(q->linestrip);
+        window.draw(q->circle);
+        window.draw(q->text);
+
+        draw(q->left, window);
+
+        draw(q->right, window);
+
+    }
+}
+//Toa do
+void AVLTree::setCordinate(Node* q, int dist)
+{
+    if (q)
+    {
+        if (q == root)
+        {
+            q->circle.setPosition(400, 140);
+            q->text.setPosition(400 + 18, 140 + 20);
+            q->text.setString(to_string(q->value));
+        }
+
+        for (int j = 0; j < 3; j++)
+        {
+            q->linestrip[j].position = (sf::Vector2f(q->circle.getPosition().x + q->circle.getRadius(), q->circle.getPosition().y + q->circle.getRadius()));
+            q->linestrip[j].color = sf::Color::Black;
+        }
+
+        if (q->left)
+        {
+            (q->left)->circle.setPosition(sf::Vector2f(q->circle.getPosition().x - dist, q->circle.getPosition().y + 100));
+            (q->left)->text.setPosition(sf::Vector2f(q->circle.getPosition().x - dist + 18, q->circle.getPosition().y + 100 + 20));
+            q->left->text.setString(to_string(q->left->value));
+
+            q->linestrip[0].position = (sf::Vector2f(q->left->circle.getPosition().x + q->left->circle.getRadius(), q->left->circle.getPosition().y + q->left->circle.getRadius()));
+            q->linestrip[0].color = sf::Color::Black;
+            setCordinate(q->left, dist / 2);
+        }
+
+
+        if (q->right)
+        {
+            (q->right)->circle.setPosition(sf::Vector2f(q->circle.getPosition().x + dist, q->circle.getPosition().y + 100));
+            (q->right)->text.setPosition(sf::Vector2f(q->circle.getPosition().x + dist + 18, q->circle.getPosition().y + 100 + 20));
+            q->right->text.setString(to_string(q->right->value));
+
+            q->linestrip[2].position = (sf::Vector2f(q->right->circle.getPosition().x + q->right->circle.getRadius(), q->right->circle.getPosition().y + q->right->circle.getRadius()));
+            q->linestrip[2].color = sf::Color::Black;
+            setCordinate(q->right, dist / 2);
+        }
+    }
+}
+//Mau vang sau khi tim kiem
+void AVLTree::setspcolor(Node* t, bool& value, sf::Clock& clock)
+{
+    if (t && value == false)
+    {
+        t->circle.setFillColor(sf::Color::Yellow);
+        value = true;
+        clock.restart();
+    }
+}
+//Thiet lap lai mau sau khi da tim kiem
+void AVLTree::setbackcolor(Node* t, bool& value)
+{
+    t->circle.setFillColor(sf::Color::Green);
+    value = false;
+}
